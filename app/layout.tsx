@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,9 +28,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-white dark:bg-gray-950`}
       >
-        {children}
+        {/* The Header will now appear at the top of every page */}
+        <Header />
+
+        {/* The 'main' tag wraps the page content. 'flex-grow' makes it fill the available space. */}
+        <main className="flex-grow container mx-auto px-4">
+          {children}
+        </main>
+
+        {/* The Footer will now appear at the bottom of every page */}
+        <Footer />
       </body>
     </html>
   );
