@@ -1,0 +1,11 @@
+.footer {
+  padding: 1.5rem;
+  margin-top: 2rem;
+  border-top: 1px solid #e5e7eb; 
+  text-align: center; 
+}
+
+[data-theme='dark'] .footer {
+  border-top: 1px solid #334155; 
+}
+
