@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './TabsGenerator.module.css';
 
+
 type Tab = {
   id: number;
   header: string;
@@ -14,6 +15,7 @@ export default function TabsGenerator() {
   const [selectedTabId, setSelectedTabId] = useState<number | null>(null);
   const [generatedCode, setGeneratedCode] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [copyButtonText, setCopyButtonText] = useState('Copy Code'); 
 
   useEffect(() => {
     try {
@@ -140,6 +142,28 @@ export default function TabsGenerator() {
       `<div data-tabs-container>\n  <div style="display: flex;">${headers}</div>\n  <div>${contents}</div>\n</div>\n${script}`
     );
   };
+  
+  
+  const handleCopyCode = () => {
+    if (!generatedCode) {
+      alert('Please generate the code first.');
+      return;
+    }
+    
+    const textArea = document.createElement('textarea');
+    textArea.value = generatedCode;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      setCopyButtonText('Copied!');
+      setTimeout(() => setCopyButtonText('Copy Code'), 2000); 
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      alert('Failed to copy code to clipboard.');
+    }
+    document.body.removeChild(textArea);
+  };
 
   const selectedTabData = tabs.find((tab) => tab.id === selectedTabId);
 
@@ -207,12 +231,20 @@ export default function TabsGenerator() {
 
         <div className={styles.preview}>
           <h2 className={styles.sectionTitle}>Output</h2>
-          <button
-            onClick={handleGenerateCode}
-            className={`${styles.button} ${styles.outputButton}`}
-          >
-            Generate Code
-          </button>
+          <div className={styles.buttonGroup}>
+            <button
+              onClick={handleGenerateCode}
+              className={`${styles.button} ${styles.outputButton}`}
+            >
+              Generate Code
+            </button>
+            <button
+              onClick={handleCopyCode}
+              className={`${styles.button} ${styles.copyButton}`}
+            >
+              {copyButtonText}
+            </button>
+          </div>
           <pre className={styles.outputCode}>
             <code>{generatedCode || 'Click "Generate Code" to see the output.'}</code>
           </pre>

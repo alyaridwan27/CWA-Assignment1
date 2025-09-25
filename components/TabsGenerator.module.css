@@ -18,14 +18,15 @@
 
 .mainContent {
   display: grid;
-  grid-template-columns: 1fr; /* Default to single column */
+  /* Default to 2 columns on larger screens */
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
 }
 
-/* Use two columns on larger screens */
-@media (min-width: 768px) {
+/* --- FIX: On smaller screens, switch to a single column layout --- */
+@media (max-width: 768px) {
   .mainContent {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -54,8 +55,11 @@
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 0.375rem;
-  border: 2px solid transparent; /* Add transparent border for consistent sizing */
-  transition: border-color 0.2s;
+  border: 2px solid transparent;
+}
+
+.selected {
+  border-color: #3b82f6;
 }
 
 .input {
@@ -67,11 +71,6 @@
   color: #111827;
 }
 
-/* --- Style for the currently selected tab --- */
-.tabItem.selected {
-  border-color: #3b82f6; /* A blue highlight color */
-}
-
 .textarea {
   min-height: 150px;
   padding: 0.5rem 0.75rem;
@@ -80,7 +79,6 @@
   background-color: #f9fafb;
   font-family: var(--font-geist-mono);
   color: #111827;
-  resize: vertical;
 }
 
 [data-theme='dark'] .input,
@@ -115,13 +113,25 @@
   background-color: #dc2626;
 }
 
+.buttonGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .outputButton {
   background-color: #16a34a;
   color: white;
-  align-self: flex-start;
 }
 .outputButton:hover {
   background-color: #15803d;
+}
+
+.copyButton {
+  background-color: #64748b;
+  color: white;
+}
+.copyButton:hover {
+  background-color: #475569;
 }
 
 .outputCode {
@@ -133,6 +143,5 @@
   word-wrap: break-word;
   font-family: var(--font-geist-mono);
   min-height: 200px;
-  border: 1px solid #475569;
 }
 

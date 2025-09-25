@@ -12,13 +12,15 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        {/* Left and Center Group */}
+        {/* Left Group - Title */}
         <div className={styles.leftGroup}>
-          <div className={styles.studentNumber}>
-            <span>22586609</span>
-          </div>
+          <Link href="/" className={styles.titleLink}>
+            <h1 className={styles.title}>LTU Code Generator</h1>
+          </Link>
+        </div>
 
-          {/* Desktop Navigation */}
+        {/* Right Group - Nav, Student No, etc. */}
+        <div className={styles.rightGroup}>
           <nav className={styles.desktopNav}>
             <Link href="/">Home</Link>
             <Link href="/about">About</Link>
@@ -26,10 +28,9 @@ export default function Header() {
             <Link href="/escape-room">Escape Room</Link>
             <Link href="/coding-races">Coding Races</Link>
           </nav>
-        </div>
-
-        {/* Right Group */}
-        <div className={styles.rightGroup}>
+          <div className={styles.studentNumber}>
+            <span>22586609</span>
+          </div>
           <ThemeToggle />
           <button
             className={styles.menuButton}
@@ -43,7 +44,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown - Now uses classes to animate */}
+      {/* Mobile Menu Dropdown */}
       <div
         className={`${styles.mobileMenu} ${
           isOpen ? styles.open : styles.closed
