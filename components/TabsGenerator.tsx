@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import styles from './TabsGenerator.module.css';
 
-// Define a type for our tab structure for better code quality
 type Tab = {
   id: number;
   header: string;
@@ -11,24 +10,21 @@ type Tab = {
 };
 
 export default function TabsGenerator() {
-  // State to hold the tabs. The initial value is now an empty array.
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [selectedTabId, setSelectedTabId] = useState<number | null>(null);
   const [generatedCode, setGeneratedCode] = useState('');
-  const [isLoading, setIsLoading] = useState(true); // To prevent errors during server rendering
+  const [isLoading, setIsLoading] = useState(true);
 
-  // --- NEW: Load tabs from localStorage when the component mounts ---
   useEffect(() => {
     try {
       const savedTabs = localStorage.getItem('userTabs');
       if (savedTabs) {
-        setTabs(JSON.parse(savedTabs));
-        // Set the first tab as selected by default if there are saved tabs
-        if (JSON.parse(savedTabs).length > 0) {
-          setSelectedTabId(JSON.parse(savedTabs)[0].id);
+        const parsedTabs = JSON.parse(savedTabs);
+        setTabs(parsedTabs);
+        if (parsedTabs.length > 0) {
+          setSelectedTabId(parsedTabs[0].id);
         }
       } else {
-        // If no tabs are saved, start with the default ones
         const defaultTabs = [
           { id: 1, header: 'Step 1', content: 'Content for Step 1' },
           { id: 2, header: 'Step 2', content: 'Content for Step 2' },
@@ -38,7 +34,6 @@ export default function TabsGenerator() {
       }
     } catch (error) {
       console.error('Failed to load tabs from localStorage', error);
-      // Fallback to default tabs in case of any error
       const defaultTabs = [
         { id: 1, header: 'Step 1', content: 'Content for Step 1' },
         { id: 2, header: 'Step 2', content: 'Content for Step 2' },
@@ -46,12 +41,10 @@ export default function TabsGenerator() {
       setTabs(defaultTabs);
       setSelectedTabId(1);
     }
-    setIsLoading(false); // Finished loading
-  }, []); // The empty array [] means this effect runs only once
+    setIsLoading(false);
+  }, []);
 
-  // --- NEW: Save tabs to localStorage whenever they change ---
   useEffect(() => {
-    // We don't want to save the initial empty array during server rendering
     if (!isLoading) {
       try {
         localStorage.setItem('userTabs', JSON.stringify(tabs));
@@ -59,7 +52,7 @@ export default function TabsGenerator() {
         console.error('Failed to save tabs to localStorage', error);
       }
     }
-  }, [tabs, isLoading]); // This effect runs whenever the 'tabs' or 'isLoading' state changes
+  }, [tabs, isLoading]);
 
   const handleAddTab = () => {
     if (tabs.length >= 15) {
@@ -78,7 +71,6 @@ export default function TabsGenerator() {
   const handleRemoveTab = (idToRemove: number) => {
     const newTabs = tabs.filter((tab) => tab.id !== idToRemove);
     setTabs(newTabs);
-    // If the removed tab was the selected one, select the first tab or nothing
     if (selectedTabId === idToRemove) {
       setSelectedTabId(newTabs.length > 0 ? newTabs[0].id : null);
     }
@@ -102,18 +94,18 @@ export default function TabsGenerator() {
     const headers = tabs
       .map(
         (tab, index) =>
-          `<button class="tab-button" style="padding: 10px 15px; border: 1px solid #ccc; background-color: ${
+          `<button data-tab-button style="padding: 10px 15px; border: 1px solid #ccc; background-color: ${
             index === 0 ? '#f0f0f0' : '#fff'
-          }; cursor: pointer;" onclick="showTab(${index})">${
-            tab.header
-          }</button>`
+          }; cursor: pointer; border-bottom-color: ${
+            index === 0 ? '#f0f0f0' : '#ccc'
+          };" onclick="showTab(this, ${index})">${tab.header}</button>`
       )
       .join('');
 
     const contents = tabs
       .map(
         (tab, index) =>
-          `<div class="tab-content" style="display: ${
+          `<div data-tab-content style="display: ${
             index === 0 ? 'block' : 'none'
           }; padding: 15px; border: 1px solid #ccc; border-top: none;">${
             tab.content
@@ -123,9 +115,10 @@ export default function TabsGenerator() {
 
     const script = `
 <script>
-  function showTab(tabIndex) {
-    const buttons = document.querySelectorAll('.tab-button');
-    const contents = document.querySelectorAll('.tab-content');
+  function showTab(selectedButton, tabIndex) {
+    const container = selectedButton.closest('[data-tabs-container]');
+    const buttons = container.querySelectorAll('[data-tab-button]');
+    const contents = container.querySelectorAll('[data-tab-content]');
     
     buttons.forEach((button, index) => {
       if (index === tabIndex) {
@@ -144,13 +137,12 @@ export default function TabsGenerator() {
 <\/script>`;
 
     setGeneratedCode(
-      `<div class="tabs-container">\n  <div class="tab-headers">${headers}</div>\n  <div class="tab-contents">${contents}</div>\n</div>\n${script}`
+      `<div data-tabs-container>\n  <div style="display: flex;">${headers}</div>\n  <div>${contents}</div>\n</div>\n${script}`
     );
   };
 
   const selectedTabData = tabs.find((tab) => tab.id === selectedTabId);
 
-  // Don't render anything until the client has loaded the data from localStorage
   if (isLoading) {
     return <div>Loading editor...</div>;
   }
@@ -179,7 +171,7 @@ export default function TabsGenerator() {
                 />
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent the tab from being selected when clicking remove
+                    e.stopPropagation();
                     handleRemoveTab(tab.id);
                   }}
                   className={`${styles.button} ${styles.removeButton}`}
