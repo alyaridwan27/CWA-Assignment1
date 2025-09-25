@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LTU Tabs Component Generator
+This is a Next.js web application built for the CSE3CWA/CSE5006 course at La Trobe University. The application allows users to dynamically create and configure a "Tabs" component and generate the corresponding self-contained HTML and JavaScript code.
 
-## Getting Started
+## Assignment 1 Submission
+Student Name: Alya Nursalma Ridwan
 
-First, run the development server:
+Student Number: 22586609
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+This project was built to meet the requirements of Assignment 1 and includes the following features:
+
+- Dynamic Tab Management: Users can add, remove, and edit the headers and content for up to 15 tabs.
+
+- Live Code Generation: The application generates standards-compliant HTML5 code with inline CSS and the necessary JavaScript to make the tabs functional.
+
+- Persistent State: The user's created tabs are automatically saved to localStorage, so their work is preserved between sessions.
+
+- Responsive Design: The application features a responsive header with a hamburger menu for smaller screens.
+
+- Dark/Light Mode: A theme toggle allows users to switch between a light and dark user interface.
+
+- Animated Mobile Menu: The hamburger menu uses a smooth CSS Transform for its open/close animation.
+
+## Tech Stack
+- Framework: Next.js 14 (with App Router)
+
+- Language: TypeScript
+
+- Styling: CSS Modules
+
+- Libraries: next-themes, lucide-react
+
+## How to Run This Project Locally
+1. Clone the repository:
+
 ```
+git clone <your-repository-url>
+```
+2. Navigate to the project directory:
+```
+cd <project-folder-name>
+```
+3. Install dependencies:
+```
+npm install
+```
+4. Run the development server:
+```
+npm run dev
+```
+5. Open http://localhost:3000 with your browser to see the result.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Acknowledgment of AI Usage
+Generative AI (including Google's Gemini) was used to assist in the development of this project, primarily for boilerplate code generation, debugging, and explaining concepts, as permitted by the course guidelines.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
