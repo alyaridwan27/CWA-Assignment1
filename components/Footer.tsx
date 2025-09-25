@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className={styles.footer}>
       <p>
-        © {currentYear} [Alya Nursalma Ridwan] - 22586609 -{' '}
+        © {currentYear} Alya Nursalma Ridwan - 22586609 -{' '}
         {new Date().toLocaleDateString()}
       </p>
     </footer>
