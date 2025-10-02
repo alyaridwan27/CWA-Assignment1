@@ -15,6 +15,8 @@ This project was built to meet the requirements of Assignment 1 and includes the
 
 - Persistent State: The user's created tabs are automatically saved to localStorage, so their work is preserved between sessions.
 
+- Active Link Highlighting: Uses cookies to remember the last visited page and highlights the corresponding link in the navigation bar, fulfilling the "Remember which menu tab you were on" requirement.
+
 - Responsive Design: The application features a responsive header with a hamburger menu for smaller screens.
 
 - Dark/Light Mode: A theme toggle allows users to switch between a light and dark user interface.
@@ -28,13 +30,13 @@ This project was built to meet the requirements of Assignment 1 and includes the
 
 - Styling: CSS Modules
 
-- Libraries: next-themes, lucide-react
+- Libraries: next-themes, lucide-react, js-cookie
 
 ## How to Run This Project Locally
 1. Clone the repository:
 
 ```
-git clone <your-repository-url>
+git clone <repo-url>
 ```
 2. Navigate to the project directory:
 ```
