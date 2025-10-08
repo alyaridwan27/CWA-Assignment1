@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  width: 100%; 
+  width: 100%;
   border-bottom: 1px solid #e5e7eb;
   background-color: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(4px);
@@ -13,53 +13,54 @@
   background-color: rgba(15, 23, 42, 0.8);
 }
 
-
 .container {
   display: flex;
   height: 3.5rem;
-  max-width: 1280px; 
+  max-width: 1440px;
   margin: 0 auto;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem; 
+  padding: 0 1rem;
   gap: 1rem;
 }
 
-/* --- Styles for the title --- */
-.titleLink {
-  text-decoration: none;
-  color: inherit;
+.leftGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; 
   flex-shrink: 0; 
 }
 
-.title {
-  font-size: 1.25rem; 
-  font-weight: 600;
-  white-space: nowrap; 
+.titleLink {
+  text-decoration: none;
+  color: inherit;
 }
 
-@media (max-width: 420px) {
-  .title {
-    font-size: 1.1rem;
-  }
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.studentNumber {
+  display: block; 
+  font-weight: bold;
+  font-size: 0.875rem;
+  white-space: nowrap;
 }
 
 .rightGroup {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: 1rem; 
+  gap: 1rem;
 }
 
 .desktopNav {
   display: none; 
 }
 
-.studentNumber {
-  display: none;
-}
-
-@media (min-width: 768px) {
+@media (min-width: 860px) { 
   .desktopNav {
     display: flex;
     align-items: center;
@@ -67,12 +68,8 @@
     font-size: 0.875rem;
     font-weight: 500;
   }
-  .studentNumber {
-    display: block; 
-    font-weight: bold;
-  }
   .rightGroup {
-    gap: 1.5rem; 
+    gap: 1.5rem;
   }
 }
 
@@ -87,9 +84,9 @@
   cursor: pointer;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 860px) {
   .menuButton {
-    display: none;
+    display: none; 
   }
 }
 
@@ -139,7 +136,6 @@
   white-space: nowrap;
   border-width: 0;
 }
-
 
 .activeLink {
   font-weight: bold;
