@@ -21,8 +21,14 @@ export default function AboutPage() {
           demonstrating its features and explaining the code structure as required
           for Assignment 1.
         </p>
-        <div className={styles.videoPlaceholder}>
-          Your video will be embedded here.
+        <div className={styles.videoWrapper}>
+          <iframe
+            className={styles.videoIframe}
+            src="https://www.youtube.com/embed/4fi-fHZVjOg?si=z_lyAz9_9f0IqsP1"
+            title="Project Walkthrough Video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
         </div>
       </div>
     </div>
