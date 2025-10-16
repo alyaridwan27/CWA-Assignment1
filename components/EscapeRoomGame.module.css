@@ -1,0 +1,147 @@
+.gameContainer {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] .gameContainer {
+  background-color: #1f2937; 
+  border-color: #374151; 
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+}
+
+[data-theme='dark'] .header {
+  border-bottom-color: #374151;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.timer {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ef4444; 
+}
+
+.startScreen {
+  text-align: center;
+  padding: 2rem;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+
+.stageTitle {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.instruction {
+  font-size: 1.125rem;
+  text-align: center;
+  line-height: 1.75;
+  max-width: 600px;
+}
+
+.codeBlock {
+  background-color: #111827; 
+  color: #e5e7eb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  white-space: pre-wrap;
+  font-family: var(--font-geist-mono);
+  width: 100%;
+  max-width: 600px;
+}
+
+.textarea {
+  width: 100%;
+  max-width: 600px;
+  min-height: 150px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: #ffffff;
+  color: #111827;
+  font-family: var(--font-geist-mono);
+}
+
+[data-theme='dark'] .textarea {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+
+.form {
+  display: flex;
+  flex-direction: column; 
+  align-items: center; 
+  gap: 1rem; 
+  width: 100%;
+}
+
+.input {
+  flex-grow: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: #ffffff;
+  color: #111827;
+  width: 100%;
+  max-width: 400px;
+}
+
+[data-theme='dark'] .input {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+.button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  background-color: #2563eb; 
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #1d4ed8; 
+}
+
+.button:disabled {
+  background-color: #9ca3af; 
+  cursor: not-allowed;
+}
+
+.message {
+  margin-top: 1rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  text-align: center;
+}
+
