@@ -18,12 +18,10 @@
 
 .mainContent {
   display: grid;
-  /* Default to 2 columns on larger screens */
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
 }
 
-/* --- FIX: On smaller screens, switch to a single column layout --- */
 @media (max-width: 768px) {
   .mainContent {
     grid-template-columns: 1fr;
@@ -95,6 +93,7 @@
   border: none;
   font-weight: 500;
   transition: background-color 0.2s;
+  white-space: nowrap; /* Prevent button text wrapping */
 }
 
 .addButton {
@@ -143,5 +142,38 @@
   word-wrap: break-word;
   font-family: var(--font-geist-mono);
   min-height: 200px;
+}
+
+/* --- NEW: Styles for the save section --- */
+.saveSection {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem; 
+}
+
+.saveSection .input {
+  flex-grow: 1;
+}
+
+.saveButton {
+  background-color: #ca8a04; 
+  color: white;
+  flex-shrink: 0; 
+}
+
+.saveButton:hover {
+  background-color: #a16207; 
+}
+
+.saveStatus {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  font-style: italic;
+  color: #4b5563;
+}
+
+[data-theme='dark'] .saveStatus {
+  color: #9ca3af; 
 }
 

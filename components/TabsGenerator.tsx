@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import styles from './TabsGenerator.module.css';
 
-
 type Tab = {
   id: number;
   header: string;
@@ -15,8 +14,11 @@ export default function TabsGenerator() {
   const [selectedTabId, setSelectedTabId] = useState<number | null>(null);
   const [generatedCode, setGeneratedCode] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [copyButtonText, setCopyButtonText] = useState('Copy Code'); 
+  const [copyButtonText, setCopyButtonText] = useState('Copy Code');
+  const [saveName, setSaveName] = useState(''); // State for the name of the tab set to save
+  const [saveStatus, setSaveStatus] = useState(''); // State for showing save success/error
 
+  // Load tabs from localStorage when the component mounts
   useEffect(() => {
     try {
       const savedTabs = localStorage.getItem('userTabs');
@@ -46,6 +48,7 @@ export default function TabsGenerator() {
     setIsLoading(false);
   }, []);
 
+  // Save tabs to localStorage whenever they change
   useEffect(() => {
     if (!isLoading) {
       try {
@@ -141,15 +144,14 @@ export default function TabsGenerator() {
     setGeneratedCode(
       `<div data-tabs-container>\n  <div style="display: flex;">${headers}</div>\n  <div>${contents}</div>\n</div>\n${script}`
     );
+    setSaveStatus(''); // Clear save status when generating new code
   };
-  
-  
+
   const handleCopyCode = () => {
     if (!generatedCode) {
       alert('Please generate the code first.');
       return;
     }
-    
     const textArea = document.createElement('textarea');
     textArea.value = generatedCode;
     document.body.appendChild(textArea);
@@ -157,13 +159,63 @@ export default function TabsGenerator() {
     try {
       document.execCommand('copy');
       setCopyButtonText('Copied!');
-      setTimeout(() => setCopyButtonText('Copy Code'), 2000); 
+      setTimeout(() => setCopyButtonText('Copy Code'), 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
       alert('Failed to copy code to clipboard.');
     }
     document.body.removeChild(textArea);
   };
+
+  // --- NEW: Function to save the generated code to the database ---
+  const handleSaveToDb = async () => {
+    if (!generatedCode) {
+      alert('Please generate the code first before saving.');
+      return;
+    }
+    if (!saveName.trim()) {
+      alert('Please enter a name for this tab set before saving.');
+      return;
+    }
+
+    setSaveStatus('Saving...'); // Indicate saving is in progress
+
+    // Extract HTML and JS parts (simple split based on <script>)
+    const scriptTagIndex = generatedCode.indexOf('<script>');
+    const htmlPart = generatedCode.substring(0, scriptTagIndex).trim();
+    const jsPart = generatedCode.substring(scriptTagIndex).trim();
+
+    try {
+      const response = await fetch('/api/tabs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: saveName,
+          htmlCode: htmlPart,
+          jsCode: jsPart,
+        }),
+      });
+
+      if (!response.ok) {
+        // If the server response is not ok (e.g., status 400, 500)
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save');
+      }
+
+      // If successful
+      const savedData = await response.json();
+      console.log('Saved successfully:', savedData);
+      setSaveStatus(`Saved successfully! (ID: ${savedData.id})`);
+      setSaveName(''); // Clear the input field after successful save
+
+    } catch (error) {
+      console.error('Error saving to DB:', error);
+      setSaveStatus(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
 
   const selectedTabData = tabs.find((tab) => tab.id === selectedTabId);
 
@@ -248,6 +300,26 @@ export default function TabsGenerator() {
           <pre className={styles.outputCode}>
             <code>{generatedCode || 'Click "Generate Code" to see the output.'}</code>
           </pre>
+
+          {/* --- NEW: Input field and button for saving --- */}
+          <div className={styles.saveSection}>
+            <input
+              type="text"
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+              placeholder="Enter a name for this tab set"
+              className={styles.input}
+            />
+            <button
+              onClick={handleSaveToDb}
+              className={`${styles.button} ${styles.saveButton}`}
+            >
+              Save to DB
+            </button>
+          </div>
+          {/* Display save status */}
+          {saveStatus && <p className={styles.saveStatus}>{saveStatus}</p>}
+
         </div>
       </div>
     </div>

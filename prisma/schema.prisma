@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Specifies the code generator (Prisma Client)
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Specifies the database connection
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL") // This pulls the URL from the .env file
+}
+
+// Model for saving the output from your Tabs Generator
+model TabSet {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String   // A name for the saved tab set
+  htmlCode  String   // The generated HTML
+  jsCode    String   // The generated JavaScript
+}
+
+// Model for saving a user's progress in the Escape Room
+model GameProgress {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userId       String   @unique // A unique ID for the player
+  currentStage Int      @default(0)
+  timeLeft     Int      @default(300)
+}
