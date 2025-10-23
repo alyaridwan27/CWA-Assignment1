@@ -1,0 +1,24 @@
+Ignore the local node_modules folder
+
+node_modules
+
+Ignore the build cache
+
+.next
+
+Ignore the Dockerfile itself
+
+Dockerfile
+
+Ignore .dockerignore
+
+.dockerignore
+
+Ignore git files
+
+.git
+.gitignore
+
+Ignore any local environment variables
+
+.env.local
