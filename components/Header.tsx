@@ -54,17 +54,31 @@ export default function Header() {
             <Link href="/" className={isActive('/') ? styles.activeLink : ''} onClick={() => handleLinkClick('/')}>
               Home
             </Link>
-            <Link href="/about" className={isActive('/about') ? styles.activeLink : ''} onClick={() => handleLinkClick('/about')}>
-              About
-            </Link>
-            <Link href="/pre-lab-questions" className={isActive('/pre-lab-questions') ? styles.activeLink : ''} onClick={() => handleLinkClick('/pre-lab-questions')}>
-              Pre-lab Questions
+            {/* --- NEW LINK ADDED --- */}
+            <Link href="/saved-tabs" className={isActive('/saved-tabs') ? styles.activeLink : ''} onClick={() => handleLinkClick('/saved-tabs')}>
+              Saved Tabs
             </Link>
             <Link href="/escape-room" className={isActive('/escape-room') ? styles.activeLink : ''} onClick={() => handleLinkClick('/escape-room')}>
               Escape Room
             </Link>
-            <Link href="/coding-races" className={isActive('/coding-races') ? styles.activeLink : ''} onClick={() => handleLinkClick('/coding-races')}>
+            <Link
+              href="/pre-lab-questions"
+              className={
+                isActive('/pre-lab-questions') ? styles.activeLink : ''
+              }
+              onClick={() => handleLinkClick('/pre-lab-questions')}
+            >
+              Pre-lab Questions
+            </Link>
+            <Link
+              href="/coding-races"
+              className={isActive('/coding-races') ? styles.activeLink : ''}
+              onClick={() => handleLinkClick('/coding-races')}
+            >
               Coding Races
+            </Link>
+            <Link href="/about" className={isActive('/about') ? styles.activeLink : ''} onClick={() => handleLinkClick('/about')}>
+              About
             </Link>
           </nav>
           <ThemeToggle />
@@ -84,19 +98,22 @@ export default function Header() {
       <div className={`${styles.mobileMenu} ${isOpen ? styles.open : styles.closed}`} id="mobile-menu">
         <nav className={styles.mobileNav}>
           <Link href="/" onClick={() => handleLinkClick('/')}>Home</Link>
-          <Link href="/about" onClick={() => handleLinkClick('/about')}>About</Link>
-          <Link href="/pre-lab-questions" onClick={() => handleLinkClick('/pre-lab-questions')}>
-            Pre-lab Questions
+          {/* --- NEW LINK ADDED --- */}
+          <Link href="/saved-tabs" onClick={() => handleLinkClick('/saved-tabs')}>
+            Saved Tabs
           </Link>
           <Link href="/escape-room" onClick={() => handleLinkClick('/escape-room')}>
             Escape Room
           </Link>
+          <Link href="/pre-lab-questions" onClick={() => handleLinkClick('/pre-lab-questions')}>
+            Pre-lab Questions
+          </Link>
           <Link href="/coding-races" onClick={() => handleLinkClick('/coding-races')}>
             Coding Races
           </Link>
+          <Link href="/about" onClick={() => handleLinkClick('/about')}>About</Link>
         </nav>
       </div>
     </header>
   );
 }
-

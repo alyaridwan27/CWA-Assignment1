@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma'; 
+import prisma from '@/lib/prisma'; // Import our Prisma Client singleton
 
 // Handler for POST requests to /api/tabs
 export async function POST(request: Request) {
   try {
-    // Parse the incoming request body as JSON
     const body = await request.json();
     const { name, htmlCode, jsCode } = body;
 
-    // Basic validation: Ensure required fields are present
     if (!name || !htmlCode || !jsCode) {
       return NextResponse.json(
         { error: 'Missing required fields: name, htmlCode, jsCode' },
@@ -16,7 +14,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Use Prisma Client to create a new record in the TabSet table
     const newTabSet = await prisma.tabSet.create({
       data: {
         name: name,
@@ -25,11 +22,9 @@ export async function POST(request: Request) {
       },
     });
 
-    // Return the newly created record as a JSON response
     return NextResponse.json(newTabSet, { status: 201 }); // 201 Created
   } catch (error) {
     console.error('Failed to create TabSet:', error);
-    // Return a generic error response
     return NextResponse.json(
       { error: 'Failed to save tab set' },
       { status: 500 } // Internal Server Error
@@ -37,4 +32,24 @@ export async function POST(request: Request) {
   }
 }
 
+// --- NEW: Handler for GET requests to /api/tabs ---
+export async function GET() {
+  try {
+    // Use Prisma Client to find all records in the TabSet table
+    // Order them by creation date, with the newest first
+    const tabSets = await prisma.tabSet.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
+    // Return the found records as a JSON response
+    return NextResponse.json(tabSets, { status: 200 }); // 200 OK
+  } catch (error) {
+    console.error('Failed to fetch TabSets:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch tab sets' },
+      { status: 500 } // Internal Server Error
+    );
+  }
+}
