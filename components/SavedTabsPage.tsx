@@ -22,6 +22,7 @@ export default function SavedTabsPage() {
     async function fetchTabSets() {
       try {
         setIsLoading(true);
+        setError(null); // Clear previous errors
         const response = await fetch('/api/tabs');
         if (!response.ok) {
           throw new Error('Failed to fetch saved tabs');
@@ -38,18 +39,55 @@ export default function SavedTabsPage() {
     fetchTabSets();
   }, []);
 
-  if (isLoading) {
-    return <div className={styles.container}><p>Loading saved tabs...</p></div>;
-  }
+  // --- NEW: Function to handle deleting a tab set ---
+  const handleDelete = async (idToDelete: string) => {
+    // 1. Confirm with the user
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this tab set? This action cannot be undone.'
+    );
 
-  if (error) {
-    return <div className={styles.container}><p className={styles.error}>{error}</p></div>;
+    if (!confirmed) {
+      return; // Stop if the user clicks "Cancel"
+    }
+
+    // 2. Call the DELETE API endpoint
+    try {
+      const response = await fetch(`/api/tabs/${idToDelete}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        // Handle HTTP errors
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete tab set');
+      }
+
+      // 3. Update the state to remove the item from the list immediately
+      setTabSets((prevTabSets) =>
+        prevTabSets.filter((tabSet) => tabSet.id !== idToDelete)
+      );
+      setError(null); // Clear any previous errors
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <p>Loading saved tabs...</p>
+      </div>
+    );
   }
 
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Saved Tab Sets</h1>
-      {tabSets.length === 0 ? (
+      
+      {/* --- NEW: Display global error messages --- */}
+      {error && <p className={styles.error}>{error}</p>}
+
+      {tabSets.length === 0 && !error ? (
         <p>You have not saved any tab sets to the database yet.</p>
       ) : (
         <div className={styles.list}>
@@ -62,8 +100,13 @@ export default function SavedTabsPage() {
                 </span>
               </div>
               <div className={styles.cardActions}>
-                {/* We will add the Delete button logic here */}
-                <button className={styles.deleteButton}>Delete</button>
+                {/* --- NEW: Added onClick handler to the button --- */}
+                <button
+                  onClick={() => handleDelete(tabSet.id)}
+                  className={styles.deleteButton}
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))}
