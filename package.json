@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "dotenv -e .env -- next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "dotenv -e .env -- next start",
     "lint": "eslint",
     "prisma:migrate": "dotenv -e .env -- npx prisma migrate dev",
     "clean": "rimraf .next"
@@ -21,10 +21,12 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.56.1",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
