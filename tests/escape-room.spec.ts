@@ -32,8 +32,9 @@ test.describe('Escape Room Game', () => {
 
     // 3. --- Solve Stage 1 ---
     await expect(page.getByText('Stage 1: The Messy Function')).toBeVisible();
+    // --- THIS IS THE FIX ---
     await page
-      .getByPlaceholder('Enter the correctly formatted code here')
+      .getByPlaceholder('Enter your code solution here')
       .fill(solution1);
     await page.getByRole('button', { name: 'Submit Answer' }).click();
     await expect(
@@ -42,6 +43,7 @@ test.describe('Escape Room Game', () => {
 
     // 4. --- Solve Stage 2 ---
     await expect(page.getByText('Stage 2: The Number Generator')).toBeVisible();
+    // --- THIS IS THE FIX ---
     await page
       .getByPlaceholder('Enter your code solution here')
       .fill(solution2);
@@ -52,6 +54,7 @@ test.describe('Escape Room Game', () => {
 
     // 5. --- Solve Stage 3 ---
     await expect(page.getByText('Stage 3: The Data Scrambler')).toBeVisible();
+    // --- THIS IS THE FIX ---
     await page
       .getByPlaceholder('Enter your code solution here')
       .fill(solution3);
@@ -78,8 +81,9 @@ test.describe('Escape Room Game', () => {
 
     // 3. --- Submit Wrong Answer for Stage 1 ---
     await expect(page.getByText('Stage 1: The Messy Function')).toBeVisible();
+    // --- THIS IS THE FIX ---
     await page
-      .getByPlaceholder('Enter the correctly formatted code here')
+      .getByPlaceholder('Enter your code solution here')
       .fill('This is the wrong answer');
     await page.getByRole('button', { name: 'Submit Answer' }).click();
 
@@ -93,4 +97,3 @@ test.describe('Escape Room Game', () => {
     ).not.toBeVisible();
   });
 });
-
