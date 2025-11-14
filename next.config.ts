@@ -1,10 +1,27 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next';
+import type { Configuration } from 'webpack';
+
+const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // Note: We don't need any special config for CSS Modules
-  // because they are enabled by default in Next.js.
-  // By using this default config, we are ensuring they are not
-  // accidentally disabled.
+
+  webpack(config: Configuration, context: { isServer: boolean }) {
+    const { isServer } = context;
+
+    if (!isServer) {
+      config.resolve = config.resolve || {};
+      config.resolve.fallback = {
+        ...(config.resolve.fallback || {}),
+        stream: false,
+        net: false,
+        tls: false,
+        events: false,
+        fs: false,
+        http2: false,
+      };
+    }
+
+    return config;
+  },
 };
 
 export default nextConfig;
