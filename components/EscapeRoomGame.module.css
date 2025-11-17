@@ -3,14 +3,28 @@
   margin: 2rem auto;
   padding: 2rem;
   border-radius: 0.75rem;
-  background-color: #f9fafb;
   border: 1px solid #e5e7eb;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  
+  /* --- FIX: New, working image URL and better opacity --- */
+  background-color: #f9fafb; /* Fallback for light mode */
+  background-image: linear-gradient(rgba(249, 250, 251, 0.9), rgba(249, 250, 251, 0.9)),
+    url('https://images.pexels.com/photos/279810/pexels-photo-279810.jpeg');
+  background-size: cover;
+  background-position: center;
+  /* --- END --- */
 }
 
 [data-theme='dark'] .gameContainer {
-  background-color: #1f2937; 
-  border-color: #374151; 
+  border-color: #374151;
+  
+  /* --- FIX: New, working image URL and better opacity --- */
+  background-color: #1f2937; /* Fallback for dark mode */
+  background-image: linear-gradient(rgba(31, 41, 55, 0.85), rgba(31, 41, 55, 0.85)),
+    url('https://images.pexels.com/photos/279810/pexels-photo-279810.jpeg');
+  background-size: cover;
+  background-position: center;
+  /* --- END --- */
 }
 
 .header {
@@ -20,6 +34,8 @@
   margin-bottom: 2rem;
   border-bottom: 1px solid #e5e7eb;
   padding-bottom: 1rem;
+  /* Making header transparent to see background */
+  background-color: transparent;
 }
 
 [data-theme='dark'] .header {
@@ -30,16 +46,18 @@
   font-size: 2rem;
   font-weight: bold;
 }
-
+/* ... (rest of the file is unchanged) ... */
 .timer {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #ef4444; 
+  color: #ef4444;
 }
 
 .startScreen {
   text-align: center;
   padding: 2rem;
+  /* Making start screen transparent to see background */
+  background-color: transparent;
 }
 
 .stage {
@@ -48,7 +66,6 @@
   align-items: center;
   gap: 1.5rem;
 }
-
 
 .stageTitle {
   font-size: 1.75rem;
@@ -64,7 +81,7 @@
 }
 
 .codeBlock {
-  background-color: #111827; 
+  background-color: #111827;
   color: #e5e7eb;
   padding: 1rem;
   border-radius: 0.5rem;
@@ -72,6 +89,8 @@
   font-family: var(--font-geist-mono);
   width: 100%;
   max-width: 600px;
+  /* Add opacity to blend slightly */
+  opacity: 0.9;
 }
 
 .textarea {
@@ -84,6 +103,8 @@
   background-color: #ffffff;
   color: #111827;
   font-family: var(--font-geist-mono);
+  /* Add opacity to blend slightly */
+  opacity: 0.9;
 }
 
 [data-theme='dark'] .textarea {
@@ -92,12 +113,11 @@
   color: #f3f4f6;
 }
 
-
 .form {
   display: flex;
-  flex-direction: column; 
-  align-items: center; 
-  gap: 1rem; 
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
   width: 100%;
 }
 
@@ -110,6 +130,8 @@
   color: #111827;
   width: 100%;
   max-width: 400px;
+  /* Add opacity to blend slightly */
+  opacity: 0.9;
 }
 
 [data-theme='dark'] .input {
@@ -122,20 +144,24 @@
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 0.375rem;
-  background-color: #2563eb; 
+  background-color: #2563eb;
   color: white;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
+  /* Add opacity to blend slightly */
+  opacity: 0.9;
 }
 
 .button:hover {
-  background-color: #1d4ed8; 
+  background-color: #1d4ed8;
+  opacity: 1;
 }
 
 .button:disabled {
-  background-color: #9ca3af; 
+  background-color: #9ca3af;
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .message {
@@ -143,5 +169,12 @@
   font-size: 1.125rem;
   font-weight: 500;
   text-align: center;
+  /* Give the message a solid backdrop for readability */
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem;
+  border-radius: 0.375rem;
 }
 
+[data-theme='dark'] .message {
+  background-color: rgba(31, 41, 55, 0.7);
+}
