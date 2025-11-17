@@ -56,3 +56,5 @@ npm run dev
 ## Acknowledgment of AI Usage
 Generative AI (including Google's Gemini) was used to assist in the development of this project, primarily for boilerplate code generation, debugging, and explaining concepts, as permitted by the course guidelines.
 
+
+
