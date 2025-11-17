@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env -- next dev",
-    "build": "next build",
-    "start": "dotenv -e .env -- next start",
+    "build": "cross-env OTEL_LOG_LEVEL=debug VERCEL_OTEL_EXPORTER_OTLP_DISABLED=1 prisma migrate deploy && next build",
+    "start": "cross-env OTEL_LOG_LEVEL=debug VERCEL_OTEL_EXPORTER_OTLP_DISABLED=1 next start",
     "lint": "next lint",
     "prisma:migrate": "dotenv -e .env -- npx prisma migrate dev",
     "clean": "rimraf .next",
