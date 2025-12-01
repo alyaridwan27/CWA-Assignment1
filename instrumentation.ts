@@ -1,7 +1,18 @@
 import "server-only";
-import { registerOTel } from "@vercel/otel";
 
 export function register() {
-  console.log(">>> instrumentation.ts: Starting Vercel OpenTelemetry...");
-  registerOTel();
+  if (process.env.NODE_ENV !== "production") {
+    console.log("Azure Monitor OTEL disabled in development mode.");
+    return;
+  }
+
+  console.log(">>> Starting Azure Monitor OTEL (production)...");
+
+  // Dynamic import to avoid bundling issues
+  const { useAzureMonitor } = require("@azure/monitor-opentelemetry");
+  
+  useAzureMonitor({
+    connectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING!,
+    samplingRatio: 1,
+  });
 }

@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // Changed from "sqlite"
+  provider = "sqlite" // Make sure this is sqlite for local dev
   url      = env("DATABASE_URL")
 }
 
@@ -20,12 +20,31 @@ model TabSet {
   jsCode    String
 }
 
-// Model for saving a user's progress in the Escape Room
+// --- NEW: Model for User-Created Escape Rooms ---
+model EscapeRoom {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  description String?
+  backgroundImage String // URL of the room background
+  timerSeconds Int     @default(300)
+  
+  // We will store the puzzles/hotspots as a JSON string
+  // This gives us flexibility without complex relations for now
+  puzzles     Json     
+}
+
+// Model for saving a user's progress (updated to link to a specific room)
 model GameProgress {
   id           String   @id @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  userId       String   @unique
+  userId       String   
+  roomId       String?  // Optional link to a specific custom room
   currentStage Int      @default(0)
   timeLeft     Int      @default(300)
+  
+  // You might want to link this to the EscapeRoom model if needed
+  // room       EscapeRoom? @relation(fields: [roomId], references: [id])
 }

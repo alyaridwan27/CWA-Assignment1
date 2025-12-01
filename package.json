@@ -4,16 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env -- next dev",
-    "build": "cross-env OTEL_LOG_LEVEL=debug VERCEL_OTEL_EXPORTER_OTLP_DISABLED=1 prisma db push && next build",
-    "start": "cross-env OTEL_LOG_LEVEL=debug VERCEL_OTEL_EXPORTER_OTLP_DISABLED=1 next start",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint",
     "prisma:migrate": "dotenv -e .env -- npx prisma migrate dev",
     "clean": "rimraf .next",
     "postinstall": "npx prisma generate"
   },
   "dependencies": {
+    "@azure/monitor-opentelemetry": "^1.14.2",
     "@prisma/client": "^6.18.0",
-    "@vercel/otel": "^2.1.0",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.544.0",
     "next": "15.5.3",
