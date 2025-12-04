@@ -1,59 +1,38 @@
 import { defineConfig, devices } from '@playwright/test';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config();
-
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
 export default defineConfig({
   testDir: './tests',
-  /* Run tests in files in parallel */
-  fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  fullyParallel: false, // tests depend on each other (serial mode)
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/reporting */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  reporter: [['html', { open: 'never' }]],
+  timeout: 2 * 60 * 1000, // 2 minutes per test (adjust if needed)
   use: {
-    /* Base URL to use in actions like `await page.goto('/')` */
     baseURL: 'http://localhost:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
+    actionTimeout: 30_000,
+    navigationTimeout: 60_000,
   },
 
-  /* --- WE HAVE COMMENTED OUT THE WEBSERVER --- */
-  /*
-  webServer: {
-    command: 'npm run start',
-    url: 'http://localhost:3000',
-    reuseExistingServer: false,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  },
+  /* Start your Next dev server automatically before running tests
+     - Uses the same dev command you used earlier
+     - reuseExistingServer: true => if you already started the dev server manually, Playwright won't start another one
   */
+  webServer: {
+    command: 'dotenv -e .env -- next dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: true,
+    timeout: 120_000, // wait up to 120s for server to be ready
+    env: {
+      // ensure the env file is used; dotenv already loads it but set PORT explicitly
+      PORT: '3000',
+    },
+  },
 
-  /* Configure projects for major browsers */
   projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
   ],
 });

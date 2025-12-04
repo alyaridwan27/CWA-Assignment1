@@ -1,26 +1,356 @@
-/* --- MAIN CONTAINER --- */
+/* ============= GENERAL LAYOUT ============= */
+
 .gameContainer {
   position: relative;
-  max-width: 1000px;
-  height: 600px; /* Fixed height for the game area */
-  margin: 2rem auto;
-  border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
   background-size: cover;
   background-position: center;
-  background-color: #1f2937; /* Fallback color */
+  color: white;
+  padding: 1rem;
 }
 
-/* --- LOADING STATE --- */
-.loadingContainer {
+/* HUD (Top Bar) */
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.timer {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Back Button */
+.backButton {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: 0.2s;
+}
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ============= ROOM MENU ============= */
+
+.menuContainer {
+  padding: 2rem;
+  max-width: 1300px;
+  margin: 0 auto;
+  color: #111827;
+}
+
+[data-theme='dark'] .menuContainer {
+  color: #F9FAFB;
+}
+
+.menuTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.roomGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+.roomCard {
+  background: #ffffff;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  transition: 0.25s;
   display: flex;
   flex-direction: column;
+}
+
+.roomCard:hover {
+  transform: scale(1.02);
+  box-shadow: 0px 6px 16px rgba(0,0,0,0.15);
+}
+
+[data-theme='dark'] .roomCard {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.roomCardImage {
+  height: 160px;
+  background-size: cover;
+  background-position: center;
+}
+
+.roomCardContent {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.roomCardContent h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.roomCardContent p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.roomMeta {
+  font-size: 0.8rem;
+  opacity: 0.65;
+  margin-top: 0.3rem;
+}
+
+/* --- Edit + Delete Buttons --- */
+
+.roomActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+
+.editButton,
+.deleteButton {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  display: flex;
   align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.editButton:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+[data-theme='dark'] .editButton {
+  background-color: #374151 !important; /* slate-700 */
+  color: #f9fafb !important; /* almost white */
+  border: 1px solid #4b5563; /* subtle border */
+}
+
+[data-theme='dark'] .editButton:hover {
+  background-color: #4b5563 !important; /* slate-600 */
+  color: white !important;
+}
+
+
+.deleteButton {
+  color: #dc2626;
+}
+
+.deleteButton:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+/* Create Button */
+.createLink,
+.createButton {
+  padding: 0.7rem 1rem;
+  background: #2563eb;
+  border-radius: 0.5rem;
+  color: white;
+  text-align: center;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 1.2rem;
+  transition: 0.2s;
+}
+
+.createLink:hover,
+.createButton:hover {
+  background: #1d4ed8;
+}
+
+.menuFooter {
+  text-align: center;
+}
+
+/* ============= HOTSPOTS ============= */
+
+.hotspot {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  cursor: pointer;
+  color: #facc15;
+  transition: transform 0.2s ease;
+}
+
+.hotspot:hover {
+  transform: translate(-50%, -100%) scale(1.15);
+}
+
+.solved {
+  color: #22c55e !important;
+}
+
+/* ============= START / WIN / LOSE SCREENS ============= */
+
+.startScreen,
+.winScreen {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 3rem 2rem;
+  border-radius: 1rem;
+  max-width: 500px;
+  margin: 4rem auto;
+  text-align: center;
+}
+
+.startScreen h1,
+.winScreen h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.bigButton {
+  margin-top: 1rem;
+  padding: 0.8rem 1.6rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  background: #2563eb;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bigButton:hover {
+  background: #1d4ed8;
+}
+
+/* ============= MODAL ============= */
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.55);
+  display: flex;
   justify-content: center;
-  height: 400px;
-  color: #6b7280;
+  align-items: center;
+  z-index: 50;
+}
+
+.modalContent {
+  background: #ffffff;
+  color: #111827;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 550px;
+  position: relative;
+  box-shadow: 0px 6px 24px rgba(0,0,0,0.2);
+}
+
+[data-theme='dark'] .modalContent {
+  background: #1f2937;
+  color: #f9fafb;
+}
+
+.closeButton {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.puzzleTitle {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.codeBlock {
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-family: monospace;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+}
+
+/* Input */
+.input,
+.textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 0.4rem;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  margin-bottom: 1rem;
+}
+
+[data-theme='dark'] .input,
+[data-theme='dark'] .textarea {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 0.7rem;
+  background: #2563eb;
+  color: white;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  border: none;
+}
+
+.submitButton:hover {
+  background: #1d4ed8;
+}
+
+/* ============= LOADING ============= */
+
+.loadingContainer {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #111827;
 }
 
 .spinner {
@@ -29,336 +359,6 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
+  from { transform: rotate(0); }
   to { transform: rotate(360deg); }
-}
-
-/* --- MENU STATE (Room Selection) --- */
-.menuContainer {
-  max-width: 1000px;
-  margin: 2rem auto;
-  padding: 2rem;
-}
-
-.menuTitle {
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.roomGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-}
-
-.roomCard {
-  background-color: #1f2937; /* Dark background for cards */
-  border: 1px solid #374151;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: flex; /* Ensure flex layout */
-  flex-direction: column;
-}
-
-.roomCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border-color: #60a5fa; /* Blue border on hover */
-}
-
-.roomCardImage {
-  height: 160px;
-  width: 100%;
-  background-size: cover;
-  background-position: center;
-  background-color: #374151;
-}
-
-.roomCardContent {
-  padding: 1.5rem;
-  flex-grow: 1; /* Ensure content fills space */
-}
-
-.roomCardContent h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: white;
-}
-
-.roomCardContent p {
-  font-size: 0.875rem;
-  color: #9ca3af;
-  margin-bottom: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* Limit to 2 lines */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.roomMeta {
-  display: block;
-  font-size: 0.75rem;
-  color: #6b7280;
-  font-weight: 500;
-  margin-top: auto; /* Push to bottom */
-}
-
-.emptyState {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 4rem;
-  background-color: #1f2937;
-  border-radius: 0.75rem;
-  border: 1px dashed #374151;
-}
-
-.createButton {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  background-color: #2563eb;
-  color: white;
-  border-radius: 0.5rem;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.menuFooter {
-  margin-top: 2rem;
-  text-align: center;
-}
-
-.createLink {
-  color: #60a5fa;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.createLink:hover {
-  text-decoration: underline;
-}
-
-/* --- HUD (In-Game) --- */
-.hud {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-  color: white;
-  z-index: 10;
-}
-
-.backButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 0.875rem;
-}
-
-.backButton:hover {
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-}
-
-.timer {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #ef4444;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  background-color: rgba(0,0,0,0.6);
-  padding: 0.25rem 0.75rem;
-  border-radius: 0.5rem;
-}
-
-/* --- HOTSPOTS --- */
-.hotspot {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.2);
-  border: 2px solid white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  transition: all 0.2s ease;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-  z-index: 5;
-}
-
-.hotspot:hover {
-  transform: translate(-50%, -50%) scale(1.1);
-  background-color: rgba(255, 255, 255, 0.4);
-}
-
-.solved {
-  border-color: #22c55e; /* Green */
-  background-color: rgba(34, 197, 94, 0.3);
-  color: #22c55e;
-}
-
-/* --- SCREENS (Start, Win, Lose) --- */
-.startScreen, .winScreen {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(4px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 30;
-  color: white;
-  text-align: center;
-  padding: 2rem;
-}
-
-.startScreen h1, .winScreen h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.bigButton {
-  display: flex;
-  align-items: center;
-  margin-top: 2rem;
-  padding: 1rem 2rem;
-  font-size: 1.25rem;
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-weight: bold;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-  transition: transform 0.1s;
-}
-
-.bigButton:hover {
-  transform: scale(1.05);
-  background-color: #1d4ed8;
-}
-
-/* --- PUZZLE MODAL --- */
-.modalOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 50; /* Ensure it's above everything */
-  padding: 1rem;
-}
-
-.modalContent {
-  background-color: #1f2937;
-  padding: 2rem;
-  border-radius: 1rem;
-  border: 1px solid #374151;
-  max-width: 600px;
-  width: 100%;
-  color: white;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-  position: relative;
-}
-
-.closeButton {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  color: #9ca3af;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
-}
-
-.closeButton:hover {
-  background-color: #374151;
-  color: white;
-}
-
-.puzzleTitle {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #60a5fa;
-  padding-right: 2rem; /* Space for close button */
-}
-
-.codeBlock {
-  background-color: #111827; 
-  color: #e5e7eb;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  white-space: pre-wrap;
-  font-family: monospace;
-  width: 100%;
-  margin-bottom: 1rem;
-  border: 1px solid #374151;
-  overflow-x: auto;
-}
-
-.textarea, .input {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 0.375rem;
-  background-color: #374151;
-  border: 1px solid #4b5563;
-  color: white;
-  margin-bottom: 1rem;
-  font-family: monospace;
-}
-
-.textarea:focus, .input:focus {
-  outline: 2px solid #60a5fa;
-  border-color: transparent;
-}
-
-.submitButton {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 0.375rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.submitButton:hover {
-  background-color: #1d4ed8;
 }

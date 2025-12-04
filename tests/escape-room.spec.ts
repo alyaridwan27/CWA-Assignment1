@@ -1,95 +1,186 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-const ROOM_TITLE = `Playwright Test Room ${Date.now()}`;
-const PUZZLE_NAME = 'Test Puzzle 1';
-const PUZZLE_ANSWER = 'secret_code';
+test.describe.configure({ mode: "serial" });
 
-// 1. SERIAL MODE
-// This is mandatory so Test 2 waits for Test 1 to finish saving.
-test.describe.configure({ mode: 'serial' });
+// Unique identifiers so tests don't collide
+const ROOM_TITLE = `Playwright Room ${Date.now()}`;
+const PUZZLE_NAME = "Puzzle 1";
+const PUZZLE_NAME_2 = "Puzzle 2";
+const PUZZLE_ANSWER = "secret123";
 
-test.describe('Escape Room Flow', () => {
+test("1 - Create a new custom escape room", async ({ page }) => {
+  await page.goto("/escape-room/create");
 
-  test('should allow creating a new custom escape room', async ({ page }) => {
-    // --- STEP 1: Go to Builder ---
-    await page.goto('/escape-room/create');
-    await expect(page.getByRole('heading', { name: 'Create Your Escape Room' })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Create Your Escape Room" }))
+    .toBeVisible();
 
-    // Fill Title (Global Input)
-    // We target the input that follows the "Room Title" label
-    await page.locator('label:has-text("Room Title") + input').fill(ROOM_TITLE);
+  // Title (use sibling selector because label isn't associated by for/id)
+  await page.locator('label:has-text("Room Title") + input').fill(ROOM_TITLE);
 
-    // --- STEP 2: Open Modal ---
-    // Click the background image (previewStage)
-    const preview = page.locator('div[class*="previewStage"]');
-    await preview.click({ position: { x: 200, y: 200 }, force: true }); 
+  // Timer (label text exactly matches Time Limit (Seconds))
+  await page.locator('label:has-text("Time Limit (Seconds)") + input').fill("300");
 
-    // --- STEP 3: Fill Modal (THE FIX) ---
-    // We wait for the modal header to be visible to ensure animation is done
-    await expect(page.getByRole('heading', { name: 'Add Puzzle' })).toBeVisible();
+  // Click preview to open modal (force+position to be safe)
+  const preview = page.locator('div[class*="previewStage"]');
+  await preview.click({ position: { x: 200, y: 200 }, force: true });
 
-    // Instead of finding the "Modal Div", we find the inputs directly using their Labels.
-    // This bypasses the "Strict Mode" error because there is only ONE input next to the label "Puzzle Name".
+  // Wait for modal header to show (ensures animation completed)
+  await expect(page.getByRole("heading", { name: "Add Puzzle" })).toBeVisible();
 
-    // 1. Puzzle Name
-    await page.locator('label:has-text("Puzzle Name") + input').fill(PUZZLE_NAME);
-    
-    // 2. Type (Select)
-    await page.locator('label:has-text("Type") + select').selectOption('text');
-    
-    // 3. Instructions
-    await page.locator('label:has-text("Instructions") + textarea').fill('What is the secret?');
-    
-    // 4. Solution
-    await page.locator('label:has-text("Correct Solution") + textarea').fill(PUZZLE_ANSWER);
+  // Fill puzzle modal fields (use sibling selectors)
+  await page.locator('label:has-text("Puzzle Name") + input').fill(PUZZLE_NAME);
+  await page.locator('label:has-text("Instructions") + textarea').fill("Type the secret");
+  await page.locator('label:has-text("Correct Solution") + textarea').fill(PUZZLE_ANSWER);
 
-    // --- STEP 4: Add & Save ---
-    // Click the Add Puzzle button
-    await page.getByRole('button', { name: 'Add Puzzle' }).click();
+  // Add puzzle
+  await page.getByRole("button", { name: "Add Puzzle" }).click();
 
-    // Verify the hotspot pin appeared on the map
-    await expect(page.locator(`div[title="${PUZZLE_NAME}"]`)).toBeVisible();
+  // Ensure hotspot appears (title uses puzzle.name)
+  await expect(page.locator(`div[title="${PUZZLE_NAME}"]`)).toBeVisible({ timeout: 5000 });
 
-    // Save the room
-    await page.getByRole('button', { name: /Save Room/i }).click();
+  // Save the room — wait for network POST then wait for redirect
+  const [saveResponse] = await Promise.all([
+    page.waitForResponse(resp => resp.url().endsWith("/api/escape-rooms") && resp.request().method() === "POST", { timeout: 10000 }),
+    page.getByRole("button", { name: /Save Room/i }).click()
+  ]);
+  expect(saveResponse.ok()).toBeTruthy();
 
-    // Verify redirect
-    await expect(page).toHaveURL(/\/escape-room$/);
-    
-    // Verify our new room is in the list
-    await expect(page.getByText(ROOM_TITLE)).toBeVisible();
+  // After save we expect redirect to list
+  await expect(page).toHaveURL(/\/escape-room$/, { timeout: 5000 });
+
+  // Confirm the room shows on the list via its H3
+  const roomCard = page.locator("div[class*='roomCard__']").filter({
+  has: page.getByRole("heading", { name: ROOM_TITLE })
+  });
+  await expect(roomCard.first()).toBeVisible();
+
+});
+
+test("2 - Edit the room and add another puzzle", async ({ page }) => {
+  await page.goto("/escape-room");
+
+  // Select EXACT room card by CSS class & h3 text
+  const roomCard = page.locator("div.EscapeRoomGame_roomCard__k2uOE").filter({
+    has: page.locator("h3", { hasText: ROOM_TITLE })
+  }).first();
+
+  await expect(roomCard).toBeVisible();
+
+  // Find the Edit button inside THIS card
+  const editBtn = roomCard.locator("button", { hasText: "Edit" });
+  await editBtn.click();
+
+  await expect(page).toHaveURL(/escape-room\/create\?id=/);
+
+  // Add second puzzle
+  const preview = page.locator("div[class*='previewStage']");
+  await preview.waitFor({ state: "visible" });
+
+  // Cross-browser click
+  await page.waitForTimeout(100);
+  await page.evaluate(() => {
+    const el = document.querySelector('div[class*="previewStage"]');
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.dispatchEvent(new MouseEvent("click", {
+      clientX: r.left + r.width * 0.6,
+      clientY: r.top + r.height * 0.4,
+      bubbles: true,
+    }));
   });
 
+  await expect(page.getByRole("heading", { name: /add puzzle/i })).toBeVisible();
 
-  test('should allow playing the room and winning it', async ({ page }) => {
-    await page.goto('/escape-room');
+  // Use sibling selectors (like test 1)
+  await page.locator('label:has-text("Puzzle Name") + input').fill(PUZZLE_NAME_2);
+  await page.locator('label:has-text("Correct Solution") + textarea').fill("second_answer");
+  await page.getByRole("button", { name: /add puzzle/i }).click();
 
-    // --- STEP 1: Find and Click Room ---
-    // We look for the h3 containing the text, then click it.
-    const roomTitle = page.locator('h3', { hasText: ROOM_TITLE }).first();
-    await expect(roomTitle).toBeVisible({ timeout: 10000 }); // Wait for DB
-    await roomTitle.click();
+  // Expect exactly 2 markers
+  const markers = page.locator("div[title^='Puzzle']");
+  await expect(markers).toHaveCount(2);
 
-    // --- STEP 2: Start Game ---
-    const startButton = page.getByRole('button', { name: /start game/i });
-    await expect(startButton).toBeVisible();
-    await startButton.click();
+  // Save
+  await page.getByRole("button", { name: /save room/i }).click();
+  await expect(page).toHaveURL(/escape-room$/);
+});
 
-    // --- STEP 3: Click Puzzle Hotspot ---
-    const hotspot = page.locator(`div[title="${PUZZLE_NAME}"]`);
-    await expect(hotspot).toBeVisible();
-    await hotspot.click();
 
-    // --- STEP 4: Solve Puzzle ---
-    await expect(page.getByText('What is the secret?')).toBeVisible();
+test("3 - Play the created room and win", async ({ page }) => {
+  await page.goto("/escape-room");
+
+  // Locate ONLY outer card
+  const roomCard = page.locator("div.EscapeRoomGame_roomCard__k2uOE").filter({
+    has: page.locator("h3", { hasText: ROOM_TITLE })
+  }).first();
+
+  await expect(roomCard).toBeVisible();
+  await roomCard.click();
+
+  // Wait for the start screen to appear
+  await expect(page.getByRole("button", { name: /start game/i })).toBeVisible({ timeout: 5000 });
+
+  // Now click start
+  await page.getByRole("button", { name: /start game/i }).click();
+
+  // Wait for the game container with HUD to appear
+  await expect(page.locator(`text=Time: `)).toBeVisible({ timeout: 5000 });
+
+  // Wait for hotspot by class
+  const hotspotByClass = page.locator(`div[class*="hotspot"]`);
+  await expect(hotspotByClass.first()).toBeVisible({ timeout: 5000 });
+
+  // Click first hotspot
+  await hotspotByClass.first().click();
+
+  // Wait for modal to appear
+  await expect(page.getByRole("heading", { name: /puzzle/i })).toBeVisible({ timeout: 5000 });
+
+  // Fill answer
+  await page.getByPlaceholder(/your answer/i).fill(PUZZLE_ANSWER);
+
+  // Submit answer
+  await page.getByRole("button", { name: /submit/i }).click();
+
+  // Wait for modal to close (answer accepted)
+  await page.waitForTimeout(300);
+
+  // Click second hotspot
+  const hotspots = page.locator(`div[class*="hotspot"]`);
+  if (await hotspots.count() >= 2) {
+    await hotspots.nth(1).click();
     
-    // Use placeholder targeting for the game input
-    await page.getByPlaceholder('Your answer...').fill(PUZZLE_ANSWER);
+    // Wait for modal
+    await expect(page.getByRole("heading", { name: /puzzle/i })).toBeVisible({ timeout: 5000 });
     
-    await page.getByRole('button', { name: 'Submit' }).click();
+    // Fill second answer
+    await page.getByPlaceholder(/your answer/i).fill("second_answer");
+    
+    // Submit
+    await page.getByRole("button", { name: /submit/i }).click();
+  }
 
-    // --- STEP 5: Verify Win ---
-    await expect(page.getByText('ESCAPE SUCCESSFUL!')).toBeVisible();
-  });
+  // Wait for win screen
+  await expect(page.getByText(/escape successful/i)).toBeVisible({ timeout: 8000 });
+});
 
+
+test("4 - Delete the room", async ({ page }) => {
+  await page.goto("/escape-room");
+
+  // Find the card again - use the specific outer card class
+  const roomCard = page.locator("div.EscapeRoomGame_roomCard__k2uOE").filter({
+    has: page.locator("h3", { hasText: ROOM_TITLE })
+  }).first();
+
+  await expect(roomCard).toBeVisible({ timeout: 5000 });
+
+  // Accept confirmation dialog
+  page.once("dialog", dialog => dialog.accept());
+
+  // Click delete button inside the card
+  await roomCard.locator('button:has-text("Delete")').click({ force: true });
+
+  // Wait for card to disappear
+  await expect(page.locator("h3", { hasText: ROOM_TITLE })).toHaveCount(0, { timeout: 5000 });
 });

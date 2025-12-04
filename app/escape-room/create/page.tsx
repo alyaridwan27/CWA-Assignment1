@@ -1,9 +1,10 @@
-import EscapeRoomBuilder from '../../../components/EscapeRoomBuilder';
+import { Suspense } from "react";
+import EscapeRoomBuilder from "./../../../components/EscapeRoomBuilder";
 
-export default function CreateRoomPage() {
+export default function CreateEscapeRoomPage() {
   return (
-    <div>
+    <Suspense fallback={<p>Loading builder...</p>}>
       <EscapeRoomBuilder />
-    </div>
+    </Suspense>
   );
 }
