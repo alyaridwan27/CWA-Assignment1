@@ -1,49 +1,80 @@
-# STAGE 1: Build Stage
-# Use an official Node.js runtime as a parent image.
-# Using 18-alpine for a smaller, more secure base.
-FROM node:18-alpine AS build
-# Set the working directory in the container
+# -----------------------------------------
+# 1. Base Image
+# -----------------------------------------
+FROM node:18-alpine AS base
+
+
+# -----------------------------------------
+# 2. Dependencies Layer
+# -----------------------------------------
+FROM base AS deps
 WORKDIR /app
 
-# Copy package.json and package-lock.json first
-# This caches our dependencies, speeding up future builds
-COPY package*.json ./
+# Copy dependencies files
+COPY package.json package-lock.json ./
 
-# Install app dependencies
-RUN npm install
+# Install dependencies (no postinstall yet → no prisma)
+RUN npm ci --ignore-scripts
 
-# Copy the rest of the application code
+
+# -----------------------------------------
+# 3. Builder Layer
+# -----------------------------------------
+FROM base AS builder
+WORKDIR /app
+
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy all project files
 COPY . .
 
-# Build the Next.js application for production
-# This creates the .next folder
+# Ensure Prisma schema is present in the container
+COPY prisma ./prisma
+
+# Prisma needs a DATABASE_URL to generate the client
+# This value is ONLY used during Docker build — runtime will override it.
+ENV DATABASE_URL="postgresql://postgres:postgres@localhost:5432/cwa?schema=public"
+
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Disable Next.js telemetry
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build the Next.js production bundle with standalone output
 RUN npm run build
 
-# STAGE 2: Production Stage
-# Use a smaller base image for the final container
-FROM node:18-alpine
 
+# -----------------------------------------
+# 4. Production Runtime Layer
+# -----------------------------------------
+FROM base AS runner
 WORKDIR /app
 
-# We only need the built app and the necessary node_modules
-# Copy the built .next folder from the 'build' stage
-COPY --from=build /app/.next ./.next
+# Environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Copy the node_modules
-# We'll prune the devDependencies to make the image smaller
-COPY --from=build /app/node_modules ./node_modules
+# Create secure user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
-# Copy package.json to run 'npm start'
-COPY package.json ./
+# Copy public files
+COPY --from=builder /app/public ./public
 
-# Copy the public and .next/static folders
-# Next.js needs these to serve static files
-COPY --from=build /app/public ./public
-COPY --from=build /app/.next/static ./.next/static
+# Copy standalone server output
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 
+# Copy static assets
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Expose the port the app runs on (Next.js default is 3000)
+# Use the non-root user
+USER nextjs
+
+# Expose port
 EXPOSE 3000
+ENV PORT=3000
 
-# The command to run when the container starts
-CMD ["npm", "start"]
+# Start the standalone server
+CMD ["node", "server.js"]

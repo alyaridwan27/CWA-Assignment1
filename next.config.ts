@@ -3,15 +3,14 @@ import type { Configuration } from 'webpack';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
 
-  // 🚀 Disable ESLint during production builds
   eslint: {
     ignoreDuringBuilds: true,
   },
 
-  webpack: (config: Configuration, { isServer }: { isServer: boolean }) => {
+  webpack: (config: Configuration, { isServer }) => {
     if (isServer) {
-      // Externalize Azure Monitor and OpenTelemetry packages
       if (config.externals && Array.isArray(config.externals)) {
         config.externals.push(
           '@azure/monitor-opentelemetry',
@@ -23,7 +22,7 @@ const nextConfig: NextConfig = {
       }
     }
     return config;
-  }
+  },
 };
 
 export default nextConfig;

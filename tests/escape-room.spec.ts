@@ -1,99 +1,95 @@
 import { test, expect } from '@playwright/test';
 
-// --- Define the correct solutions here ---
-const solution1 = `function messy(a, b) {
-  if (a > b) {
-    return a;
-  } else {
-    return b;
-  }
-}`;
+const ROOM_TITLE = `Playwright Test Room ${Date.now()}`;
+const PUZZLE_NAME = 'Test Puzzle 1';
+const PUZZLE_ANSWER = 'secret_code';
 
-const solution2 = `for (let i = 0; i <= 1000; i++) {
-  console.log(i);
-}`;
+// 1. SERIAL MODE
+// This is mandatory so Test 2 waits for Test 1 to finish saving.
+test.describe.configure({ mode: 'serial' });
 
-const solution3 = `function reverseString(str) {
-  return str.split('').reverse().join('');
-}`;
-// ----------------------------------------
+test.describe('Escape Room Flow', () => {
 
-// Group tests for the Escape Room
-test.describe('Escape Room Game', () => {
-  // Test 1: The "Win" Scenario (Happy Path)
-  test('should allow a user to play through and win the game', async ({
-    page,
-  }) => {
-    // 1. Go to the escape room page
-    await page.goto('/escape-room');
+  test('should allow creating a new custom escape room', async ({ page }) => {
+    // --- STEP 1: Go to Builder ---
+    await page.goto('/escape-room/create');
+    await expect(page.getByRole('heading', { name: 'Create Your Escape Room' })).toBeVisible();
 
-    // 2. Start the game
-    await page.getByRole('button', { name: 'Start Timer' }).click();
+    // Fill Title (Global Input)
+    // We target the input that follows the "Room Title" label
+    await page.locator('label:has-text("Room Title") + input').fill(ROOM_TITLE);
 
-    // 3. --- Solve Stage 1 ---
-    await expect(page.getByText('Stage 1: The Messy Function')).toBeVisible();
-    // --- THIS IS THE FIX ---
-    await page
-      .getByPlaceholder('Enter your code solution here')
-      .fill(solution1);
-    await page.getByRole('button', { name: 'Submit Answer' }).click();
-    await expect(
-      page.getByText('Correct! Moving to the next stage.')
-    ).toBeVisible();
+    // --- STEP 2: Open Modal ---
+    // Click the background image (previewStage)
+    const preview = page.locator('div[class*="previewStage"]');
+    await preview.click({ position: { x: 200, y: 200 }, force: true }); 
 
-    // 4. --- Solve Stage 2 ---
-    await expect(page.getByText('Stage 2: The Number Generator')).toBeVisible();
-    // --- THIS IS THE FIX ---
-    await page
-      .getByPlaceholder('Enter your code solution here')
-      .fill(solution2);
-    await page.getByRole('button', { name: 'Submit Answer' }).click();
-    await expect(
-      page.getByText('Correct! Moving to the next stage.')
-    ).toBeVisible();
+    // --- STEP 3: Fill Modal (THE FIX) ---
+    // We wait for the modal header to be visible to ensure animation is done
+    await expect(page.getByRole('heading', { name: 'Add Puzzle' })).toBeVisible();
 
-    // 5. --- Solve Stage 3 ---
-    await expect(page.getByText('Stage 3: The Data Scrambler')).toBeVisible();
-    // --- THIS IS THE FIX ---
-    await page
-      .getByPlaceholder('Enter your code solution here')
-      .fill(solution3);
-    await page.getByRole('button', { name: 'Submit Answer' }).click();
+    // Instead of finding the "Modal Div", we find the inputs directly using their Labels.
+    // This bypasses the "Strict Mode" error because there is only ONE input next to the label "Puzzle Name".
 
-    // 6. --- Check for Win Screen ---
-    await expect(
-      page.getByRole('heading', { name: 'You Escaped!' })
-    ).toBeVisible();
-    await expect(
-      page.getByText('Congratulations, you solved all the puzzles with time to spare.')
-    ).toBeVisible();
+    // 1. Puzzle Name
+    await page.locator('label:has-text("Puzzle Name") + input').fill(PUZZLE_NAME);
+    
+    // 2. Type (Select)
+    await page.locator('label:has-text("Type") + select').selectOption('text');
+    
+    // 3. Instructions
+    await page.locator('label:has-text("Instructions") + textarea').fill('What is the secret?');
+    
+    // 4. Solution
+    await page.locator('label:has-text("Correct Solution") + textarea').fill(PUZZLE_ANSWER);
+
+    // --- STEP 4: Add & Save ---
+    // Click the Add Puzzle button
+    await page.getByRole('button', { name: 'Add Puzzle' }).click();
+
+    // Verify the hotspot pin appeared on the map
+    await expect(page.locator(`div[title="${PUZZLE_NAME}"]`)).toBeVisible();
+
+    // Save the room
+    await page.getByRole('button', { name: /Save Room/i }).click();
+
+    // Verify redirect
+    await expect(page).toHaveURL(/\/escape-room$/);
+    
+    // Verify our new room is in the list
+    await expect(page.getByText(ROOM_TITLE)).toBeVisible();
   });
 
-  // Test 2: The "Fail" Scenario (Wrong Answer)
-  test('should show an error message for an incorrect answer', async ({
-    page,
-  }) => {
-    // 1. Go to the escape room page
+
+  test('should allow playing the room and winning it', async ({ page }) => {
     await page.goto('/escape-room');
 
-    // 2. Start the game
-    await page.getByRole('button', { name: 'Start Timer' }).click();
+    // --- STEP 1: Find and Click Room ---
+    // We look for the h3 containing the text, then click it.
+    const roomTitle = page.locator('h3', { hasText: ROOM_TITLE }).first();
+    await expect(roomTitle).toBeVisible({ timeout: 10000 }); // Wait for DB
+    await roomTitle.click();
 
-    // 3. --- Submit Wrong Answer for Stage 1 ---
-    await expect(page.getByText('Stage 1: The Messy Function')).toBeVisible();
-    // --- THIS IS THE FIX ---
-    await page
-      .getByPlaceholder('Enter your code solution here')
-      .fill('This is the wrong answer');
-    await page.getByRole('button', { name: 'Submit Answer' }).click();
+    // --- STEP 2: Start Game ---
+    const startButton = page.getByRole('button', { name: /start game/i });
+    await expect(startButton).toBeVisible();
+    await startButton.click();
 
-    // 4. --- Check for Error Message ---
-    await expect(page.getByText('Incorrect answer. Try again.')).toBeVisible();
+    // --- STEP 3: Click Puzzle Hotspot ---
+    const hotspot = page.locator(`div[title="${PUZZLE_NAME}"]`);
+    await expect(hotspot).toBeVisible();
+    await hotspot.click();
 
-    // 5. --- Ensure we are still on Stage 1 ---
-    await expect(page.getByText('Stage 1: The Messy Function')).toBeVisible();
-    await expect(
-      page.getByText('Correct! Moving to the next stage.')
-    ).not.toBeVisible();
+    // --- STEP 4: Solve Puzzle ---
+    await expect(page.getByText('What is the secret?')).toBeVisible();
+    
+    // Use placeholder targeting for the game input
+    await page.getByPlaceholder('Your answer...').fill(PUZZLE_ANSWER);
+    
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    // --- STEP 5: Verify Win ---
+    await expect(page.getByText('ESCAPE SUCCESSFUL!')).toBeVisible();
   });
+
 });
